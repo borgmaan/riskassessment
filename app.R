@@ -43,11 +43,11 @@ ui <- fluidPage(
   tabsetPanel(
     id = "apptabs",
     tabPanel(
-      title = "Risk Assessment - v0.0.1",
+      title = "Risk Assessment",
       icon = icon("clipboard-list"),
       
       titlePanel(
-        windowTitle = "Risk Assessment",
+        windowTitle = "Risk Assessment - v0.0.1",
         title = div(id = "page-title", "R Package Risk Assessment App")
       ),
       
@@ -97,13 +97,12 @@ ui <- fluidPage(
     )
   ),
 
-  footer =
-    wellPanel(
-      id = "footer",
-      "Checkout the app's code!",
-      tags$a(href = "https://github.com/pharmaR/risk_assessment",
-             icon("github-alt"), target = "_blank")
-    )
+  wellPanel(
+    id = "footer",
+    "Checkout the app's code!",
+    tags$a(href = "https://github.com/pharmaR/risk_assessment",
+           icon("github-alt"), target = "_blank")
+  )
 )
 
 
