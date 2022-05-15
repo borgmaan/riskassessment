@@ -23,6 +23,7 @@ theme <- bs_theme(
   # fg = "#023967",
   primary = "#24305E",
   secondary = "#F76C6C",
+  "font-size-base" = "0.75rem",
   # success = "orange",
   # info = "yellow",
   # warning = "pink"
