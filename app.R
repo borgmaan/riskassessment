@@ -114,6 +114,11 @@ ui <- shinymanager::secure_app(
               href = file.path('css', 'login_screen.css')),
     id = "login_screen",
     tags$h2("Risk Assessment Application", style = "align:center")),
+  tags_bottom = tags$div(
+    tags$h6(HTML('<em>Note:</em> To log in, use either the admin user:
+    <u>admin</u> or the non-admin user: <u>nonadmin</u>, both with
+    password <u>QWERTY1!</u>.'),
+            style = 'color: white')),
   enable_admin = TRUE, theme = theme)
 
 add_tags <- function(ui, ...) {
