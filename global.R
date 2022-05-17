@@ -29,6 +29,8 @@ library(rintrojs)
 library(bslib)
 library(shinymanager)
 library(glue)
+library(waiter)
+
 
 passphrase <- 'somepassphrase'
 
