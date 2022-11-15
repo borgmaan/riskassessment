@@ -8,3 +8,6 @@ $credentials.*
 $database.*
 ^README\.Rmd$
 ^\.github$
+^\.open$
+^docs$
+^www$
