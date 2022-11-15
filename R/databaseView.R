@@ -46,6 +46,7 @@ databaseViewUI <- function(id) {
 #' @param user a user name
 #' @param uploaded_pkgs a vector of uploaded package names
 #' @param metric_weights a reactive data.frame holding metric weights
+#' @param changes a reactive indicating changes in metric weights
 #'
 #' @import dplyr
 #' @importFrom lubridate as_datetime

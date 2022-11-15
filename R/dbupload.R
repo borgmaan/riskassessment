@@ -46,6 +46,8 @@ get_latest_pkg_info <- function(pkg_name) {
 
 #' Call function to get and upload info from CRAN/local to db.
 #' 
+#' @param pkg_name a character vector specifying the package name
+#' 
 #' @importFrom loggit loggit
 #' 
 insert_pkg_info_to_db <- function(pkg_name) {
@@ -88,6 +90,15 @@ insert_pkg_info_to_db <- function(pkg_name) {
 
 #' Upload the general info into DB.
 #' 
+#' @param name package name
+#' @param version package version
+#' @param title package title
+#' @param description package description
+#' @param authors package authors
+#' @param maintainers package maintainers
+#' @param license package license
+#' @param published_on package publication date
+#' 
 #' @importFrom glue glue
 #' @importFrom loggit loggit
 #' 
@@ -114,6 +125,8 @@ upload_package_to_db <- function(name, version, title, description,
 #' The 'Insert MM to DB' Function
 #'
 #' Get the maintenance and testing metrics info and upload into DB.
+#' 
+#' @param pkg_name a character vector specifying the package name
 #' 
 #' @import dplyr
 #' @importFrom riskmetric pkg_ref pkg_assess pkg_score
@@ -181,6 +194,8 @@ insert_maintenance_metrics_to_db <- function(pkg_name){
 
 
 #' Generate community usage metrics and upload data into DB
+#' 
+#' @param pkg_name a character vector specifying the package name
 #' 
 #' @import dplyr
 #' @importFrom cranlogs cran_downloads

@@ -7,7 +7,9 @@
 showComments(pkg_name, comments)
 }
 \arguments{
-\item{pkg_name}{a data.frame}
+\item{pkg_name}{a string}
+
+\item{comments}{a data.frame}
 }
 \description{
 Displays formatted comments

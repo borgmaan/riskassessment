@@ -27,12 +27,13 @@ metricBoxServer(
 
 \item{is_perc}{whether the value is a percentage.}
 
+\item{is_url}{whether the value is a url.}
+
 \item{succ_icon}{icon used if is_true.}
 
 \item{unsucc_icon}{icon used if not is_true.}
 
-\item{is_true}{whether the metric is TRUE. If true, then the succ_icon will
-be used; if false, then the unsucc_icon will be used.}
+\item{icon_class}{class of the icon used for formatting.}
 }
 \description{
 Server logic for the 'Metric Box' module

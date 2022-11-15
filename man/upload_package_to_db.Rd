@@ -15,6 +15,23 @@ upload_package_to_db(
   published_on
 )
 }
+\arguments{
+\item{name}{package name}
+
+\item{version}{package version}
+
+\item{title}{package title}
+
+\item{description}{package description}
+
+\item{authors}{package authors}
+
+\item{maintainers}{package maintainers}
+
+\item{license}{package license}
+
+\item{published_on}{package publication date}
+}
 \description{
 Upload the general info into DB.
 }

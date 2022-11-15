@@ -6,6 +6,9 @@
 \usage{
 insert_pkg_info_to_db(pkg_name)
 }
+\arguments{
+\item{pkg_name}{a character vector specifying the package name}
+}
 \description{
 Call function to get and upload info from CRAN/local to db.
 }
