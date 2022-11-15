@@ -10,7 +10,6 @@
 #'
 #' @keywords internal
 #'
-#' @import shiny
 #' @import dplyr
 #' 
 "_PACKAGE"

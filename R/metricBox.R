@@ -2,7 +2,6 @@
 #' 
 #' @param id a module id name
 #' 
-#' @import shiny
 metricBoxUI <- function(id) {
   uiOutput(NS(id, "metricBox_ui"))
 }
@@ -19,7 +18,6 @@ metricBoxUI <- function(id) {
 #' @param succ_icon icon used if is_true.
 #' @param unsucc_icon icon used if not is_true.
 #'
-#' @import shiny
 #' @import dplyr
 #' @importFrom stringr str_sub
 #' @importFrom glue glue

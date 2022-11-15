@@ -5,7 +5,6 @@
 #' 
 #' @param message a string
 #' 
-#' @import shiny
 showHelperMessage <- function(message = "Please select a package"){
   h6(message,
      style = 
@@ -21,7 +20,6 @@ showHelperMessage <- function(message = "Please select a package"){
 #' @param pkg_name a string
 #' @param pkg_name a data.frame
 #' 
-#' @import shiny
 #' @export
 showComments <- function(pkg_name, comments){
   if (length(pkg_name) == 0)

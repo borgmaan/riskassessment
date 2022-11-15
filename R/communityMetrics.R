@@ -3,7 +3,6 @@
 #' 
 #' @param id a module id name
 #' 
-#' @import shiny
 communityMetricsUI <- function(id) {
   uiOutput(NS(id, 'communityMetrics_ui'))
 }
@@ -15,7 +14,6 @@ communityMetricsUI <- function(id) {
 #' @param community_metrics placeholder
 #' @param user placeholder
 #' 
-#' @import shiny
 #' @import dplyr
 #' @importFrom glue glue
 #' @importFrom plotly plotlyOutput renderPlotly

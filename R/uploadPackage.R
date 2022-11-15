@@ -2,7 +2,6 @@
 #' 
 #' @param id a module id
 #' 
-#' @import shiny
 #' @importFrom DT dataTableOutput
 #' 
 uploadPackageUI <- function(id) {

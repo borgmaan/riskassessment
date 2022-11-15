@@ -2,7 +2,6 @@
 #' 
 #' @param id the module id
 #' 
-#' @import shiny
 #' 
 reweightViewUI <- function(id) {
   tagList(
@@ -16,7 +15,6 @@ reweightViewUI <- function(id) {
 #' @param id the module id
 #' @param user the user name
 #' 
-#' @import shiny
 #' @import dplyr
 #' @importFrom DT datatable formatStyle styleEqual renderDataTable
 #' @importFrom shinyjs enable disable delay

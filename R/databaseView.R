@@ -9,7 +9,6 @@ setColorPalette <- colorRampPalette(c(low_risk_color, med_risk_color, high_risk_
 #' 
 #' @param id a module id name
 #' 
-#' @import shiny
 #' @importFrom shinydashboard box
 #' @importFrom DT dataTableOutput
 #' 
@@ -48,7 +47,6 @@ databaseViewUI <- function(id) {
 #' @param uploaded_pkgs a vector of uploaded package names
 #' @param metric_weights a reactive data.frame holding metric weights
 #'
-#' @import shiny
 #' @import dplyr
 #' @importFrom lubridate as_datetime
 #' @importFrom stringr str_replace_all str_replace

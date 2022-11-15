@@ -2,7 +2,6 @@
 #' 
 #' @param id a module id name
 #' 
-#' @import shiny
 reportPreviewUI <- function(id) {
   uiOutput(NS(id, "reportPreview_ui"))
 }
@@ -21,7 +20,6 @@ reportPreviewUI <- function(id) {
 #' @param app_version placeholder
 #' @param metric_weights placeholder
 #' 
-#' @import shiny
 #' @import dplyr
 #' @importFrom rmarkdown render
 #' @importFrom plotly plotlyOutput renderPlotly
