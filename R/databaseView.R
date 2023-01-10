@@ -9,7 +9,7 @@ setColorPalette <- colorRampPalette(c(low_risk_color, med_risk_color, high_risk_
 #' 
 #' @param id a module id name
 #' 
-#' @import shiny
+#' 
 #' @importFrom shinydashboard box
 #' @importFrom DT dataTableOutput
 #' 
@@ -34,7 +34,7 @@ databaseViewUI <- function(id) {
                   downloadButton(NS(id, "download_reports"), "Download Report(s)")),
                 column(
                   width = 6,
-                  selectInput(NS(id, "report_formats"), "Select Format", c("html", "docx"))
+                  selectInput(NS(id, "report_formats"), "Select Format", c("html", "docx", "pdf"))
                 )
               )))
       ))
@@ -47,8 +47,9 @@ databaseViewUI <- function(id) {
 #' @param user a user name
 #' @param uploaded_pkgs a vector of uploaded package names
 #' @param metric_weights a reactive data.frame holding metric weights
+#' @param changes a reactive value integer count
 #'
-#' @import shiny
+#' 
 #' @import dplyr
 #' @importFrom lubridate as_datetime
 #' @importFrom stringr str_replace_all str_replace
@@ -149,7 +150,7 @@ databaseViewServer <- function(id, user, uploaded_pkgs, metric_weights, changes)
           glue::glue('RiskAssessment-Report-{report_datetime}.zip')
         } else {
           glue::glue('{selected_pkgs$name}_{selected_pkgs$version}_Risk_Assessment.',
-               "{switch(input$report_formats, docx = 'docx', html = 'html')}")
+                     "{switch(input$report_formats, docx = 'docx', html = 'html', pdf = 'pdf')}")
         }
       },
       content = function(file) {
@@ -169,14 +170,51 @@ databaseViewServer <- function(id, user, uploaded_pkgs, metric_weights, changes)
             
             my_tempdir <- tempdir()
             if (input$report_formats == "html") {
+              
+              # TODO: Remove temporary warning once bug in fa v0.4.0 is fixed.
+              # https://github.com/rstudio/fontawesome/issues/99
+              # Here, we make sure user has a functional version of fontawesome
+              fa_v <- packageVersion("fontawesome")
+              if(fa_v != '0.3.0') {
+                msg1 <- "HTML reports require {fontawesome} v0.3.0 to render."
+                msg2 <- glue::glue("You currently have v{fa_v} installed. If the report download failed, please install correct version using code:")
+                code <- "remotes::install_version('fontawesome', version = '0.3.0', repos = 'http://cran.us.r-project.org')"
+                warning(paste(msg1, msg2, code))
+                showModal(modalDialog(
+                  size = "l",
+                  title = h3("HTML report requires {fontawesome} v0.3.0", class = "mb-0 mt-0 txt-color"),
+                  h5(msg2),
+                  wellPanel(code)
+                ))
+              }
+              
               Report <- file.path(my_tempdir, "reportHtml.Rmd")
               file.copy(file.path('inst/app/www', 'reportHtml.Rmd'), Report, overwrite = TRUE)
-            } else { 
-              # docx
+            } 
+            else if (input$report_formats == "docx") { 
               Report <- file.path(my_tempdir, "reportDocx.Rmd")
               if (!dir.exists(file.path(my_tempdir, "images")))
                 dir.create(file.path(my_tempdir, "images"))
               file.copy(file.path('inst/app/www', 'ReportDocx.Rmd'),
+                        Report,
+                        overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'read_html.lua'),
+                        file.path(my_tempdir, "read_html.lua"), overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'images', 'user-tie.png'),
+                        file.path(my_tempdir, "images", "user-tie.png"),
+                        overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'images', 'user-shield.png'),
+                        file.path(my_tempdir, "images", "user-shield.png"),
+                        overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'images', 'calendar-alt.png'),
+                        file.path(my_tempdir, "images", "calendar-alt.png"),
+                        overwrite = TRUE)
+            } 
+            else { 
+              Report <- file.path(my_tempdir, "reportPdf.Rmd")
+              if (!dir.exists(file.path(my_tempdir, "images")))
+                dir.create(file.path(my_tempdir, "images"))
+              file.copy(file.path('inst/app/www', 'ReportPdf.Rmd'),
                         Report,
                         overwrite = TRUE)
               file.copy(file.path('inst/app/www', 'read_html.lua'),
@@ -205,9 +243,9 @@ databaseViewServer <- function(id, user, uploaded_pkgs, metric_weights, changes)
                 file
               }
               
-              
+              # Collect info about package.
               selected_pkg <- get_pkg_info(this_pkg)
-              this_pack <- list(
+              pkg_list <- list(
                 id = selected_pkg$id,
                 name = selected_pkg$name,
                 version = selected_pkg$version,
@@ -217,7 +255,8 @@ databaseViewServer <- function(id, user, uploaded_pkgs, metric_weights, changes)
                 author = selected_pkg$author,
                 maintainer = selected_pkg$maintainer,
                 license = selected_pkg$license,
-                published = selected_pkg$published
+                published = selected_pkg$published,
+                score = selected_pkg$score
               )
               
               # gather comments data
@@ -226,7 +265,7 @@ databaseViewServer <- function(id, user, uploaded_pkgs, metric_weights, changes)
               cm_comments <- get_cm_comments(this_pkg)
               
               # gather maint metrics & community metric data
-              mm_data <- get_mm_data(this_pack$id)
+              mm_data <- get_mm_data(pkg_list$id)
               comm_data <- get_comm_data(this_pkg)
               comm_cards <- build_comm_cards(comm_data)
               downloads_plot <- build_comm_plotly(comm_data)
@@ -236,9 +275,9 @@ databaseViewServer <- function(id, user, uploaded_pkgs, metric_weights, changes)
                 input = Report,
                 output_file = path,
                 clean = FALSE,
-                params = list(pkg = this_pack,
+                params = list(pkg = pkg_list,
                               riskmetric_version = paste0(packageVersion("riskmetric")),
-                              app_version = app_version,
+                              app_version = golem::get_golem_options('app_version'),
                               metric_weights = metric_weights(),
                               user_name = user$name,
                               user_role = user$role,

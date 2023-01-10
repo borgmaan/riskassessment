@@ -2,7 +2,7 @@
 #' 
 #' @param id a module id name
 #' 
-#' @import shiny
+#' 
 reportPreviewUI <- function(id) {
   uiOutput(NS(id, "reportPreview_ui"))
 }
@@ -21,7 +21,7 @@ reportPreviewUI <- function(id) {
 #' @param app_version placeholder
 #' @param metric_weights placeholder
 #' 
-#' @import shiny
+#' 
 #' @import dplyr
 #' @importFrom rmarkdown render
 #' @importFrom plotly plotlyOutput renderPlotly
@@ -53,7 +53,7 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
             br(), br(),
             
             div(id = "dwnld_rp",
-                selectInput(NS(id, "report_format"), "Select Format", c("html", "docx")),
+                selectInput(NS(id, "report_formats"), "Select Format", c("html", "docx", "pdf")),
                 downloadButton(NS(id, 'download_report'), "Download Report")
             ),
             
@@ -84,14 +84,7 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
                 br(), br(),
                 hr(),
                 fluidRow(
-                  column(width = 12,
-                         h5("Community Usage Metrics",
-                            style = "text-align: center; padding-bottom: 50px;"),
-                         metricGridUI(NS(id, 'cm_metricGrid')),
-                         div(id = "cum_plot", fluidRow(
-                           column(width = 12, style = 'padding-left: 20px; padding-right: 20px;',
-                                  plotly::plotlyOutput(NS(id, "downloads_plot"), height = "500px")))),
-                         viewCommentsUI(NS(id, 'cm_comments')))
+                  column(width = 12, uiOutput(NS(id, 'communityMetrics_ui')))
                 ),
                 br(), br(),
                 hr(),
@@ -145,6 +138,30 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
     # Community usage metrics cards.
     metricGridServer("cm_metricGrid", metrics = com_metrics)
     
+    output$communityMetrics_ui <- renderUI({
+      
+      vect <- dbSelect("select distinct id from community_usage_metrics") %>% dplyr::pull()
+      
+      if(!selected_pkg$name() %in% vect) {
+        tagList(
+          h5("Community Usage Metrics",
+             style = "text-align: center;"),
+        showHelperMessage(message = glue::glue("Community Usage Metrics not avaiable for ", {selected_pkg$name()} ))
+        )
+      } else {
+        tagList(
+          h5("Community Usage Metrics",
+             style = "text-align: center; padding-bottom: 50px;"),
+          metricGridUI(NS(id, 'cm_metricGrid')),
+          div(id = "cum_plot", fluidRow(
+            column(width = 12, style = 'padding-left: 20px; padding-right: 20px;',
+                   plotly::plotlyOutput(NS(id, "downloads_plot"), height = "500px")))),
+          viewCommentsUI(NS(id, 'cm_comments'))
+        )
+      }
+      
+    })
+    
     
     # Display general information of the selected package.
     output$pkg_overview <- renderUI({
@@ -164,8 +181,11 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
     
     # Display the decision status of the selected package.
     output$decision_display <- renderUI({
+      req(selected_pkg$name())
       
       tagList(
+        h5('Risk Score:'),
+        selected_pkg$score(),
         h5('Overall risk:'),
         ifelse(selected_pkg$decision() == '', 
                'Pending',
@@ -196,7 +216,7 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
     output$download_report <- downloadHandler(
       filename = function() {
         glue::glue('{selected_pkg$name()}_{selected_pkg$version()}_Risk_Assessment.',
-             "{switch(input$report_format, docx = 'docx', html = 'html')}")
+             "{switch(input$report_formats, docx = 'docx', html = 'html', pdf = 'pdf')}")
       },
       content = function(file) {
         shiny::withProgress(
@@ -209,10 +229,27 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
             report <- ''
             my_tempdir <- tempdir()
             
-            if (input$report_format == "html") {
+            if (input$report_formats == "html") {
+              # TODO: Remove temporary warning once bug in fa v0.4.0 is fixed.
+              # https://github.com/rstudio/fontawesome/issues/99
+              # Here, we make sure user has a functional version of fontawesome
+              fa_v <- packageVersion("fontawesome")
+              if(fa_v != '0.3.0') {
+                msg1 <- "HTML reports require {fontawesome} v0.3.0 to render."
+                msg2 <- glue::glue("You currently have v{fa_v} installed. If the report download failed, please install correct version using code:")
+                code <- "remotes::install_version('fontawesome', version = '0.3.0', repos = 'http://cran.us.r-project.org')"
+                warning(paste(msg1, msg2, code))
+                showModal(modalDialog(
+                  size = "l",
+                  title = h3("HTML report requires {fontawesome} v0.3.0", class = "mb-0 mt-0 txt-color"),
+                  h5(msg2),
+                  wellPanel(code)
+                ))
+              }
+              
               report <- file.path('inst/app/www', 'reportHtml.Rmd')
             }
-            else {
+            else if (input$report_formats == "docx") {
               report <- file.path(my_tempdir, "reportDocx.Rmd")
               if (!dir.exists(file.path(my_tempdir, "images")))
                 dir.create(file.path(my_tempdir, "images"))
@@ -230,12 +267,28 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
               file.copy(file.path('inst/app/www', 'images', 'calendar-alt.png'),
                         file.path(my_tempdir, "images", "calendar-alt.png"),
                         overwrite = TRUE)
+            } else {
+              report <- file.path(my_tempdir, "reportPdf.Rmd")
+              if (!dir.exists(file.path(my_tempdir, "images")))
+                dir.create(file.path(my_tempdir, "images"))
+              file.copy(file.path('inst/app/www', 'reportPdf.Rmd'),
+                        report, overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'read_html.lua'),
+                        file.path(my_tempdir, "read_html.lua"),
+                        overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'images', 'user-tie.png'),
+                        file.path(my_tempdir, "images", "user-tie.png"),
+                        overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'images', 'user-shield.png'),
+                        file.path(my_tempdir, "images", "user-shield.png"),
+                        overwrite = TRUE)
+              file.copy(file.path('inst/app/www', 'images', 'calendar-alt.png'),
+                        file.path(my_tempdir, "images", "calendar-alt.png"),
+                        overwrite = TRUE)
             }
             
-            # file.copy(report, report_path, overwrite = TRUE)
-            
             # Collect info about package.
-            pkg <- list(
+            pkg_list <- list(
               id = selected_pkg$id(),
               name = selected_pkg$name(),
               version = selected_pkg$version(),
@@ -245,13 +298,14 @@ reportPreviewServer <- function(id, selected_pkg, maint_metrics, com_metrics,
               author = selected_pkg$author(),
               maintainer = selected_pkg$maintainer(),
               license = selected_pkg$license(),
-              published = selected_pkg$published()
+              published = selected_pkg$published(),
+              score = selected_pkg$score()
             )
             
             rmarkdown::render(
               report,
               output_file = file,
-              params = list(pkg = pkg,
+              params = list(pkg = pkg_list,
                             riskmetric_version = paste0(packageVersion("riskmetric")),
                             app_version = app_version,
                             metric_weights = metric_weights(),

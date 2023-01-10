@@ -4,9 +4,14 @@
 dev_history.R
 ^dev$
 $run_dev.*
-$credentials.*
-$database.*
 ^README\.Rmd$
 ^\.github$
+^LICENSE\.md$
+^.open$
+^docs$
+^loggit.json$
 ^app\.R$
 ^rsconnect$
+^((?!/).)*sqlite$
+
+_\.new\.png$

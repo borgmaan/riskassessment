@@ -4,10 +4,7 @@
 #' most components of the app, central to it's function
 #' 
 #' @param id a module id
-#' @param user a username
-#' @param uploaded_pkgs a vector of packages
 #' 
-#' @import shiny
 #' @importFrom shinyjs disabled
 #' 
 sidebarUI <- function(id) {
@@ -85,14 +82,14 @@ sidebarUI <- function(id) {
 #' @param user a username
 #' @param uploaded_pkgs a vector of packages
 #' 
-#' @import shiny
+#' 
 #' @importFrom shinyjs enable disable
 #' 
 sidebarServer <- function(id, user, uploaded_pkgs) {
   moduleServer(id, function(input, output, session) {
     
     # Required for shinyhelper to work.
-    shinyhelper::observe_helpers()
+    # shinyhelper::observe_helpers()
     
     # Create list of packages.
     output$select_pkg_ui <- renderUI({
@@ -448,7 +445,8 @@ sidebarServer <- function(id, user, uploaded_pkgs) {
       maintainer = reactive(selected_pkg$maintainer),
       license = reactive(selected_pkg$license),
       published = reactive(selected_pkg$published),
-      overall_comment_added = reactive(c(input$submit_overall_comment, input$submit_overall_comment_yes))
+      overall_comment_added = reactive(c(input$submit_overall_comment, input$submit_overall_comment_yes)),
+      score = reactive(selected_pkg$score)
     )
   })
 }
