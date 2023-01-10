@@ -153,6 +153,7 @@ to thank:
   *Maintainer*
 - [Marly Gotti](https://www.marlygotti.com), Previously Biogen
 - Robert Krajcik, Cytel
+- Jeff Thompson, Cytel
 - Maya Gans, Cytel
 - Aravind Reddy Kallem
 - Fission Labs India Pvt Ltd

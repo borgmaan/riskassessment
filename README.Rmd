@@ -119,6 +119,7 @@ We would like to thank all the contributors! Specifically, we would like to than
 - [Aaron Clark](https://www.linkedin.com/in/dataaaronclark/), Biogen, *Maintainer*
 - [Marly Gotti](https://www.marlygotti.com), Previously Biogen
 - Robert Krajcik, Cytel
+- Jeff Thompson, Cytel
 - Maya Gans, Cytel
 - Aravind Reddy Kallem
 - Fission Labs India Pvt Ltd
