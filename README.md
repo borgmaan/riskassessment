@@ -7,6 +7,8 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Coverage status](https://codecov.io/gh/borgmaan/riskassessment/branch/dev/graph/badge.svg)](https://codecov.io/github/borgmaan/riskassessment?branch=dev)
+
 <!-- badges: end -->
 
 `riskassessment` is an R package containing a shiny front-end to augment
